@@ -1,0 +1,5 @@
+{
+  "secret": "iluminati-prod",
+  "database": "mongodb://127.0.0.1:27017/fishemall",
+  "port": "8080"
+}
