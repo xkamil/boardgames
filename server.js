@@ -1,13 +1,11 @@
-let ENV = process.env.NODE_ENV;
-let env = ENV || 'prod';
 let express = require('express');
 let app = express();
 let bodyParser = require('body-parser');
 let morgan = require('morgan');
-let config = require('./config/' + env + '.json');
+let config = require('./config/config');
 let mongoose = require('mongoose');
-let jwt = require('jsonwebtoken');
-let User = require('./controllers/models/user');
+
+mongoose.Promise = global.Promise;
 
 // Connect to database
 mongoose.connect(config.database);
@@ -20,16 +18,29 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 // Setup logging
-env == 'test' || app.use(morgan('combined'));
+config.env == 'test' || app.use(morgan('dev'));
 
 // Routes
-app.get('/', (req, res) => {
-    res.status(200).json({message: 'test'});
-});
+
+// # Authentication
+let authRouter = require('./controllers/routes/authentication');
+app.use(authRouter);
+
+// # Authorization middleware
+let authorizationRouter = require('./controllers/routes/authorization');
+app.use(authorizationRouter);
+
+// # Users
+let usersRouter = require('./controllers/routes/users');
+app.use('/users', usersRouter);
+
+// # Error handler
+let errorHandlerRouter = require('./controllers/routes/error_handler');
+app.use(errorHandlerRouter);
 
 // Run server
 app.listen(config.port);
 
 console.log('Server running on port: ' + config.port);
-console.log('Current enviroment: ' + env);
+console.log('Current enviroment: ' + config.env);
 module.exports = app;

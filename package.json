@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "cross-env NODE_ENV=dev node server.js",
+    "dev": "cross-env NODE_ENV=dev nodemon server.js",
     "test": "mocha --timeout 10000"
   },
   "author": "Kamil Wróbel",
@@ -15,6 +15,7 @@
     "config": "^1.25.1",
     "cross-env": "^4.0.0",
     "express": "^4.15.2",
+    "fs": "0.0.1-security",
     "jsonwebtoken": "^7.3.0",
     "mongoose": "^4.9.5",
     "morgan": "^1.8.1"

@@ -1,5 +1,7 @@
 {
   "secret": "iluminati-test",
   "database": "mongodb://127.0.0.1:27017/fishemalltest",
-  "port": "3001"
+  "port": "3001",
+  "token_lifetime": "10h",
+  "env": "test"
 }

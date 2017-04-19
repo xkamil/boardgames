@@ -1,5 +1,7 @@
 {
   "secret": "iluminati-dev",
   "database": "mongodb://127.0.0.1:27017/fishemalldev",
-  "port": "3000"
+  "port": "3000",
+  "token_lifetime": 10000000,
+  "env": "dev"
 }
