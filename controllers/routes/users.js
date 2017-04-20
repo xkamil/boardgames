@@ -4,13 +4,28 @@ let exceptions = require('../../exceptions/exceptions');
 
 let User = require('../models/user');
 
-router.get('/', (req, res, next)=> {
-    let query = {deleted: false};
+router.get('/setup', (req, res)=> {
 
-    User.find(query, (err, users)=> {
-        if (err) return next(err);
-        res.json(users);
+    let nick = new User({
+        name: 'kamil',
+        password: 'limak',
+        admin: true,
+        deleted: false
+    });
+
+    nick.save((err)=> {
+        if (err) res.status(500).send(err.message);
+
+        res.json({message: "success"});
     })
+});
+
+router.get('/me', (req, res, next)=> {
+    let decoded = req.decoded;
+
+    if(!decoded._doc) return next(new exceptions.InternalServerException());
+
+    res.json(decoded._doc);
 });
 
 router.get('/:id', (req, res, next)=> {
@@ -39,19 +54,12 @@ router.delete('/:id', (req, res, next) => {
     });
 });
 
-router.get('/setup', (req, res)=> {
+router.get('/', (req, res, next)=> {
+    let query = {deleted: false};
 
-    let nick = new User({
-        name: 'kamil',
-        password: 'limak',
-        admin: true,
-        deleted: false
-    });
-
-    nick.save((err)=> {
-        if (err) res.status(500).send(err.message);
-
-        res.json({message: "success"});
+    User.find(query, (err, users)=> {
+        if (err) return next(err);
+        res.json(users);
     })
 });
 

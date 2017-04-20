@@ -11,6 +11,7 @@
   "author": "Kamil Wróbel",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.17.1",
     "config": "^1.25.1",
     "cross-env": "^4.0.0",

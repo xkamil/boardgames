@@ -37,3 +37,13 @@ module.exports.ResourceNotFound = function (message, status, statusCode) {
 
     return error;
 };
+
+module.exports.InternalServerException = function (message, status, statusCode) {
+    let error = {};
+
+    error.message = message || 'Internal server exception.';
+    error.status = status || 500;
+    if (statusCode) error.statusCode = statusCode;
+
+    return error;
+};
