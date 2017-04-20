@@ -1,6 +1,7 @@
 let exceptions = require('../../exceptions/exceptions');
 let config = require('../../config/config');
 let jwt = require('jsonwebtoken');
+let User = require('../models/user');
 
 module.exports = (req, res, next)=> {
     if(config.env != 'prod' && process.env.DISABLE_AUTORIZATION) return next(); // disable authorization in test env
@@ -12,7 +13,15 @@ module.exports = (req, res, next)=> {
     jwt.verify(token, config.secret, (err, decoded) => {
         if(err) return next(new exceptions.AuthenticationFailed('Invalid or expired token.'));
 
-        req.decoded = decoded;
-        next();
+        let decodedUser = decoded._doc;
+
+        User.findById(decodedUser._id, (err, user) => {
+            if(err) return next(err);
+            if(!user) return next(new exceptions.AuthenticationFailed('User not found.'));
+            if(user.deleted) return next(new exceptions.AuthenticationFailed('User is not active.'));
+
+            req.user = decodedUser;
+            next();
+        });
     });
 };

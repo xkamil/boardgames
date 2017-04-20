@@ -1,8 +1,18 @@
 module.exports.AuthenticationFailed = function (message, status, statusCode) {
     let error = {};
 
-    error.message = message || 'Authorization failed.';
+    error.message = message || 'Authentication failed.';
     error.status = status || 401;
+    if (statusCode) error.statusCode = statusCode;
+
+    return error;
+};
+
+module.exports.AuthorizationException = function (message, status, statusCode) {
+    let error = {};
+
+    error.message = message || 'Authorization failed.';
+    error.status = status || 403;
     if (statusCode) error.statusCode = statusCode;
 
     return error;
