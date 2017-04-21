@@ -25,17 +25,22 @@ config.env == 'test' || app.use(morgan('dev'));
 // # Authentication
 let authRouter = require('./controllers/routes/authentication');
 app.use(authRouter);
+console.log();
 
 // # Authorization middleware
-let authorizationRouter = require('./controllers/routes/authorization');
+let authorizationRouter = require('./controllers/middleware/authorization');
 app.use(authorizationRouter);
 
 // # Users
 let usersRouter = require('./controllers/routes/users');
 app.use('/users', usersRouter);
 
+// # Tags
+let tagsRouter = require('./controllers/routes/tags');
+app.use('/tags', tagsRouter);
+
 // # Error handler
-let errorHandlerRouter = require('./controllers/routes/error_handler');
+let errorHandlerRouter = require('./controllers/middleware/error_handler');
 app.use(errorHandlerRouter);
 
 // Run server

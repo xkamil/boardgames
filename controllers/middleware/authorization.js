@@ -4,8 +4,6 @@ let jwt = require('jsonwebtoken');
 let User = require('../models/user');
 
 module.exports = (req, res, next)=> {
-    if(config.env != 'prod' && process.env.DISABLE_AUTORIZATION) return next(); // disable authorization in test env
-
     let token = req.body.token || req.query.token || req.headers['x-access-token'];
 
     if(!token) return next(new exceptions.AuthenticationFailed('User not authorized'));
