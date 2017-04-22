@@ -91,7 +91,7 @@ describe('TAGS', () => {
 
     describe('POST /tags/:tag', ()=> {
 
-        it('should add tag andrespond with http 201 if admin creates valid token', (done)=> {
+        it('should add tag and respond with http 201', (done)=> {
             chai.request(server)
                 .post('/tags/tag4')
                 .set('x-access-token', adminToken)
@@ -110,7 +110,7 @@ describe('TAGS', () => {
                 })
         });
 
-        it('should respond with http 400 if admin creates invalid token', (done)=> {
+        it('should respond with http 400 if admin creates invalid tag', (done)=> {
             chai.request(server)
                 .post('/tags/ta')
                 .set('x-access-token', adminToken)

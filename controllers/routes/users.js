@@ -3,11 +3,27 @@ let router = express.Router();
 let exceptions = require('../../exceptions/exceptions');
 
 let User = require('../models/user');
+let Place = require('../models/place');
 
 router.get('/me', (req, res, next)=> {
     res.json(req.user);
 });
 
+//TODO tests
+// Get places added by user. Filtered by place status
+router.get('/me/places', (req, res, next)=> {
+    let status = req.query.status;
+    let query = {user_id: req.user._id};
+    
+    if (status) query.status = status;
+
+    Place.find(query, (err, places)=> {
+        if (err) return next(err);
+        res.json(places);
+    });
+});
+
+// Get not deleted user by id
 router.get('/:id', (req, res, next)=> {
     let userId = req.params.id;
     let query = {_id: userId, deleted: false};
@@ -19,6 +35,7 @@ router.get('/:id', (req, res, next)=> {
     })
 });
 
+// Delete user by id
 router.delete('/:id', (req, res, next) => {
     let loggedUser = req.user;
     let userId = req.params.id;
@@ -28,7 +45,7 @@ router.delete('/:id', (req, res, next) => {
         if (err) return next(err);
         if (!user) return next(new exceptions.ResourceNotFound());
 
-        if(!loggedUser.admin || loggedUser._id != userId){
+        if (!loggedUser.admin || loggedUser._id != userId) {
             return next(new exceptions.AuthorizationException('You cant delete other users.'));
         }
 
@@ -40,6 +57,7 @@ router.delete('/:id', (req, res, next) => {
     });
 });
 
+// Get all not deleted users
 router.get('/', (req, res, next)=> {
     let query = {deleted: false};
 

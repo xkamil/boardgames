@@ -4,14 +4,15 @@ let Status = require('./status');
 
 let placeSchema = new Schema(
     {
-        images: [String],
+        images: [Schema.Types.ObjectId],
         created: {type: Date, default: Date.now},
         updated: {type: Date, default: Date.now},
-        location: ObjectId,
+        location: Schema.Types.ObjectId,
+        user_id: Schema.Types.ObjectId,
         tags: [String],
         description: [String],
-        likes: [ObjectId],
-        status: {type: String, default: Status.active},
+        likes: [Schema.Types.ObjectId],
+        status: {type: String, default: Status.draft},
     },
     {
         versionKey: false

@@ -3,6 +3,8 @@ process.env.NODE_ENV = 'test';
 let bcrypt = require('bcryptjs');
 let mongoose = require('mongoose');
 let User = require('./../controllers/models/user');
+let Place = require('./../controllers/models/place');
+let Status = require('./../controllers/models/status');
 
 let chai = require('chai');
 let chaiHttp = require('chai-http');
@@ -14,7 +16,8 @@ chai.use(chaiHttp);
 describe('USERS', () => {
 
     let samplepassword = bcrypt.hashSync('testpass');
-
+    let userData = {};
+    let user2Data = {};
     let token = '';
 
     beforeEach((done)=> {
@@ -36,8 +39,10 @@ describe('USERS', () => {
             deleted: true
         });
         User.remove({}, (err)=> {
-            user.save((err)=> {
-                user2.save((err)=> {
+            user.save((err, user)=> {
+                userData = user;
+                user2.save((err, user)=> {
+                    user2Data = user;
                     deletedUser.save((err)=> {
                         chai.request(server)
                             .post('/authenticate')
@@ -153,4 +158,73 @@ describe('USERS', () => {
 
     });
 
+    describe('GET /users/me/places', ()=> {
+
+        beforeEach((done)=> {
+
+            let place1 = new Place({
+                user_id: userData._id,
+                description: 'user place1',
+                status: Status.draft
+            });
+
+            let place2 = new Place({
+                user_id: userData._id,
+                description: 'user place2',
+                status: Status.active
+            });
+
+            let place3 = new Place({
+                user_id: user2Data._id,
+                description: 'user2 place1'
+            });
+
+            place1.save((err)=> {
+                place2.save((err)=> {
+                    place3.save((err)=> {
+                        done();
+                    })
+                })
+            })
+        });
+
+        afterEach((done)=> {
+            Place.remove({}, (err)=> {
+                done();
+            });
+        });
+
+        it('should respond with http 200 and list with 2 places', (done)=> {
+
+            chai.request(server)
+                .get('/users/me/places')
+                .set('x-access-token', token)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    chai.expect(res.body.length).to.equal(2);
+                    done();
+                })
+        });
+
+        it('should filter places by status in query string', (done)=> {
+
+            chai.request(server)
+                .get('/users/me/places?status=' + Status.draft)
+                .set('x-access-token', token)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    chai.expect(res.body.length).to.equal(1);
+
+                    chai.request(server)
+                        .get('/users/me/places?status=' + Status.deleted)
+                        .set('x-access-token', token)
+                        .end((err, res) => {
+                            res.should.have.status(200);
+                            chai.expect(res.body.length).to.equal(0);
+                            done();
+                        })
+
+                })
+        });
+    });
 });
