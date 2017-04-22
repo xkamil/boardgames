@@ -1,20 +1,45 @@
 let express = require('express');
 let router = express.Router();
 let exceptions = require('../../exceptions/exceptions');
+let bcrypt = require('bcryptjs');
 
 let User = require('../models/user');
 let Place = require('../models/place');
+
+// Change password
+router.put('/me/password', (req, res, next) => {
+    let user = req.user;
+    let newPassword = req.body.password;
+
+    if (!newPassword || newPassword.length < 5) return next(new exceptions.BadRequest('Password required. Min 5 characters.', null, 4002));
+
+    User.findById(user._id, (err, user)=> {
+        if (err) return next(err);
+        if (!user) return next(exceptions.ResourceNotFound('Username not found'));
+
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(newPassword, salt, (err, hash) => {
+                if (err) return next(err);
+                user.password = hash;
+
+                user.save((err, user)=> {
+                    if (err) return next(err);
+                    res.status(200).json(user);
+                })
+            });
+        });
+    })
+});
 
 router.get('/me', (req, res, next)=> {
     res.json(req.user);
 });
 
-//TODO tests
 // Get places added by user. Filtered by place status
 router.get('/me/places', (req, res, next)=> {
     let status = req.query.status;
     let query = {user_id: req.user._id};
-    
+
     if (status) query.status = status;
 
     Place.find(query, (err, places)=> {

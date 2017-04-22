@@ -121,6 +121,27 @@ describe('USERS', () => {
 
     });
 
+    describe('PUT /users/me/password', ()=> {
+
+        it('should respond with http 200 and change user password', (done)=> {
+            let hashPassword = bcrypt.hashSync('newpassword');
+
+            chai.request(server)
+                .put('/users/me/password')
+                .set('x-access-token', token)
+                .send({password: 'newpassword'})
+                .end((err, res) => {
+                    res.should.have.status(200);
+
+                    User.findById(userData._id, (err, user)=> {
+                        chai.expect(user.password).to.equal(hashPassword);
+                    });
+                    done();
+                })
+        });
+
+    });
+
     describe('DELETE /users/:id', ()=> {
 
         it('should respond with http 200 and updated user data', (done)=> {
