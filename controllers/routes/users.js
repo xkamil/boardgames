@@ -13,22 +13,16 @@ router.put('/me/password', (req, res, next) => {
 
     if (!newPassword || newPassword.length < 5) return next(new exceptions.BadRequest('Password required. Min 5 characters.', null, 4002));
 
-    User.findById(user._id, (err, user)=> {
-        if (err) return next(err);
-        if (!user) return next(exceptions.ResourceNotFound('Username not found'));
-
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(newPassword, salt, (err, hash) => {
                 if (err) return next(err);
-                user.password = hash;
 
-                user.save((err, user)=> {
+                User.findOneAndUpdate({_id: user._id}, {password: hash}, null, (err, user) => {
                     if (err) return next(err);
                     res.status(200).json(user);
-                })
+                });
             });
         });
-    })
 });
 
 router.get('/me', (req, res, next)=> {

@@ -1,5 +1,6 @@
 process.env.NODE_ENV = 'test';
 
+let SpecHelper = require("./spec_helper");
 let bcrypt = require('bcryptjs');
 let mongoose = require('mongoose');
 let User = require('./../controllers/models/user');
@@ -15,46 +16,19 @@ chai.use(chaiHttp);
 
 describe('USERS', () => {
 
-    let samplepassword = bcrypt.hashSync('testpass');
-    let userData = {};
-    let user2Data = {};
-    let token = '';
+    let testData;
 
     beforeEach((done)=> {
 
-        let user = new User({
-            name: 'janusz',
-            password: samplepassword,
-            admin: true
+        SpecHelper.beforeEach((data) => {
+            testData = data;
+            done();
         });
 
-        let user2 = new User({
-            name: 'roman',
-            password: samplepassword
-        });
+    });
 
-        let deletedUser = new User({
-            name: 'mateusz',
-            password: samplepassword,
-            deleted: true
-        });
-        User.remove({}, (err)=> {
-            user.save((err, user)=> {
-                userData = user;
-                user2.save((err, user)=> {
-                    user2Data = user;
-                    deletedUser.save((err)=> {
-                        chai.request(server)
-                            .post('/authenticate')
-                            .send({username: 'janusz', password: 'testpass'})
-                            .end((err, res) => {
-                                token = res.body.token;
-                                done();
-                            });
-                    });
-                });
-            });
-        });
+    afterEach((done) => {
+        SpecHelper.afterEach(done);
     });
 
     describe('GET /users', ()=> {
@@ -62,7 +36,7 @@ describe('USERS', () => {
         it('should respond with http 200 and array with 2 users', (done)=> {
             chai.request(server)
                 .get('/users')
-                .set('x-access-token', token)
+                .set('x-access-token', testData.users.token1)
                 .end((err, res) => {
                     res.should.have.status(200);
                     chai.expect(res.body.length).to.equal(2);
@@ -77,7 +51,7 @@ describe('USERS', () => {
         it('should respond with http 404 if user with :id not exists', (done)=> {
             chai.request(server)
                 .get('/users/58f8fead0f8a312cb0aafddb')
-                .set('x-access-token', token)
+                .set('x-access-token', testData.users.token1)
                 .end((err, res) => {
                     res.should.have.status(404);
                     done();
@@ -90,7 +64,7 @@ describe('USERS', () => {
 
                 chai.request(server)
                     .get('/users/' + user._id)
-                    .set('x-access-token', token)
+                    .set('x-access-token', testData.users.token1)
                     .end((err, res) => {
                         res.should.have.status(200);
                         res.body.should.have.property('name');
@@ -109,7 +83,7 @@ describe('USERS', () => {
         it('should respond with http 200 and logged in user data', (done)=> {
             chai.request(server)
                 .get('/users/me')
-                .set('x-access-token', token)
+                .set('x-access-token', testData.users.token1)
                 .end((err, res) => {
                     res.should.have.status(200);
                     chai.expect(res.body.name).to.equal('janusz');
@@ -124,19 +98,21 @@ describe('USERS', () => {
     describe('PUT /users/me/password', ()=> {
 
         it('should respond with http 200 and change user password', (done)=> {
-            let hashPassword = bcrypt.hashSync('newpassword');
 
             chai.request(server)
                 .put('/users/me/password')
-                .set('x-access-token', token)
+                .set('x-access-token', testData.users.token1)
                 .send({password: 'newpassword'})
                 .end((err, res) => {
                     res.should.have.status(200);
 
-                    User.findById(userData._id, (err, user)=> {
-                        chai.expect(user.password).to.equal(hashPassword);
+                    User.findById(testData.users.user1._id, (err, user)=> {
+                        bcrypt.compare('newpassword', user.password, (err, result) => {
+                            chai.expect(result).to.equal(true);
+                            done();
+                        });
+
                     });
-                    done();
                 })
         });
 
@@ -146,11 +122,9 @@ describe('USERS', () => {
 
         it('should respond with http 200 and updated user data', (done)=> {
             User.findOne({name: 'janusz'}, (err, user) => {
-                if (err || !user) fail();
-
                 chai.request(server)
                     .delete('/users/' + user._id)
-                    .set('x-access-token', token)
+                    .set('x-access-token', testData.users.token1)
                     .end((err, res) => {
                         res.should.have.status(200);
                         res.body.should.have.property('name');
@@ -166,7 +140,7 @@ describe('USERS', () => {
         it('should respond with http 404 if user not exists', (done)=> {
             chai.request(server)
                 .delete('/users/58f8fead0f8a312cb0aafddb')
-                .set('x-access-token', token)
+                .set('x-access-token', testData.users.token1)
                 .end((err, res) => {
                     res.should.have.status(404);
                     done();
@@ -181,45 +155,11 @@ describe('USERS', () => {
 
     describe('GET /users/me/places', ()=> {
 
-        beforeEach((done)=> {
-
-            let place1 = new Place({
-                user_id: userData._id,
-                description: 'user place1',
-                status: Status.draft
-            });
-
-            let place2 = new Place({
-                user_id: userData._id,
-                description: 'user place2',
-                status: Status.active
-            });
-
-            let place3 = new Place({
-                user_id: user2Data._id,
-                description: 'user2 place1'
-            });
-
-            place1.save((err)=> {
-                place2.save((err)=> {
-                    place3.save((err)=> {
-                        done();
-                    })
-                })
-            })
-        });
-
-        afterEach((done)=> {
-            Place.remove({}, (err)=> {
-                done();
-            });
-        });
-
         it('should respond with http 200 and list with 2 places', (done)=> {
 
             chai.request(server)
                 .get('/users/me/places')
-                .set('x-access-token', token)
+                .set('x-access-token', testData.users.token1)
                 .end((err, res) => {
                     res.should.have.status(200);
                     chai.expect(res.body.length).to.equal(2);
@@ -231,14 +171,14 @@ describe('USERS', () => {
 
             chai.request(server)
                 .get('/users/me/places?status=' + Status.draft)
-                .set('x-access-token', token)
+                .set('x-access-token', testData.users.token1)
                 .end((err, res) => {
                     res.should.have.status(200);
                     chai.expect(res.body.length).to.equal(1);
 
                     chai.request(server)
                         .get('/users/me/places?status=' + Status.deleted)
-                        .set('x-access-token', token)
+                        .set('x-access-token', testData.users.token1)
                         .end((err, res) => {
                             res.should.have.status(200);
                             chai.expect(res.body.length).to.equal(0);

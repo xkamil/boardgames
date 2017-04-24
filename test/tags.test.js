@@ -4,6 +4,7 @@ let bcrypt = require('bcryptjs');
 let mongoose = require('mongoose');
 let User = require('./../controllers/models/user');
 let Tag = require('./../controllers/models/tag');
+let SpecHelper = require("./spec_helper");
 
 let chai = require('chai');
 let chaiHttp = require('chai-http');
@@ -14,64 +15,19 @@ chai.use(chaiHttp);
 
 describe('TAGS', () => {
 
-    let samplepassword = bcrypt.hashSync('testpass');
-
-    let adminToken = '';
-    let userToken = '';
-
-    before((done)=> {
-
-        let user = new User({
-            name: 'janusz',
-            password: samplepassword,
-            admin: true
-        });
-
-        let user2 = new User({
-            name: 'roman',
-            password: samplepassword
-        });
-
-        user.save((err)=> {
-            user2.save((err)=> {
-                chai.request(server)
-                    .post('/authenticate')
-                    .send({username: 'janusz', password: 'testpass'})
-                    .end((err, res) => {
-                        adminToken = res.body.token;
-
-                        chai.request(server)
-                            .post('/authenticate')
-                            .send({username: 'roman', password: 'testpass'})
-                            .end((err, res) => {
-                                userToken = res.body.token;
-                                done();
-                            });
-                    });
-            });
-        });
-    });
-
-    after((done)=> {
-        User.remove({}, (err)=> {done()});
-    });
+    let testData;
 
     beforeEach((done)=> {
-        let tag1 = new Tag({tag: "tag1"});
-        let tag2 = new Tag({tag: "tag2"});
-        let tag3 = new Tag({tag: "tag3"});
 
-        tag1.save((err)=> {
-            tag2.save((err)=> {
-                tag3.save((err)=> {
-                    done();
-                })
-            })
-        })
+        SpecHelper.beforeEach((data) => {
+            testData = data;
+            done();
+        });
+
     });
 
     afterEach((done)=> {
-        Tag.remove({}, (err)=> {done()});
+        SpecHelper.afterEach(done);
     });
 
     describe('GET /tags', ()=> {
@@ -79,7 +35,7 @@ describe('TAGS', () => {
         it('should respond with http 200 and array with 3 tags', (done)=> {
             chai.request(server)
                 .get('/tags')
-                .set('x-access-token', adminToken)
+                .set('x-access-token', testData.users.token1)
                 .end((err, res) => {
                     res.should.have.status(200);
                     chai.expect(res.body.length).to.equal(3);
@@ -94,13 +50,13 @@ describe('TAGS', () => {
         it('should add tag and respond with http 201', (done)=> {
             chai.request(server)
                 .post('/tags/tag4')
-                .set('x-access-token', adminToken)
+                .set('x-access-token', testData.users.token1)
                 .end((err, res) => {
                     res.should.have.status(201);
 
                     chai.request(server)
                         .get('/tags')
-                        .set('x-access-token', adminToken)
+                        .set('x-access-token', testData.users.token1)
                         .end((err, res) => {
                             res.should.have.status(200);
                             chai.expect(res.body.length).to.equal(4);
@@ -113,7 +69,7 @@ describe('TAGS', () => {
         it('should respond with http 400 if admin creates invalid tag', (done)=> {
             chai.request(server)
                 .post('/tags/ta')
-                .set('x-access-token', adminToken)
+                .set('x-access-token', testData.users.token1)
                 .end((err, res) => {
                     res.should.have.status(400);
                     done();
@@ -123,7 +79,7 @@ describe('TAGS', () => {
         it('should respond with http 403 if user with no admin role is creating tag', (done)=> {
             chai.request(server)
                 .post('/tags/tag4')
-                .set('x-access-token', userToken)
+                .set('x-access-token', testData.users.token2)
                 .end((err, res) => {
                     res.should.have.status(403);
                     done();
