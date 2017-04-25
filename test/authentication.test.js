@@ -1,9 +1,7 @@
 process.env.NODE_ENV = 'test';
 
-let bcrypt = require('bcryptjs');
 let mongoose = require('mongoose');
-let User = require('./../controllers/models/user');
-
+let SpecHelper = require("./spec_helper");
 let chai = require('chai');
 let chaiHttp = require('chai-http');
 let server = require('../server');
@@ -14,13 +12,21 @@ chai.use(chaiHttp);
 
 describe('AUTHENTICATION', () => {
 
-    let samplepassword = bcrypt.hashSync('testpass');
+    let testData;
 
     beforeEach((done)=> {
 
-        User.remove({}, (err)=> {
+        SpecHelper.beforeEach((data) => {
+            testData = data;
             done();
-        })
+        });
+
+    });
+
+    afterEach((done)=> {
+
+        SpecHelper.afterEach(done);
+
     });
 
     describe('POST /register', ()=> {
@@ -37,22 +43,13 @@ describe('AUTHENTICATION', () => {
         });
 
         it('should respond with http 409 if username already taken', (done) => {
-
-            let user = new User({
-                name: 'mateusz',
-                password: samplepassword,
-                deleted: false
-            });
-
-            user.save((err)=> {
-                chai.request(server)
-                    .post('/register')
-                    .send({username: 'mateusz', password: 'testpass'})
-                    .end((err, res) => {
-                        res.should.have.status(409);
-                        done();
-                    })
-            });
+            chai.request(server)
+                .post('/register')
+                .send({username: 'roman', password: 'testpass'})
+                .end((err, res) => {
+                    res.should.have.status(409);
+                    done();
+                })
         });
 
         it('should respond with http 400 if username is shorter than 5 characters', (done) => {
@@ -80,26 +77,6 @@ describe('AUTHENTICATION', () => {
     });
 
     describe('POST /authenticate', ()=> {
-
-        beforeEach((done)=> {
-
-            let user = new User({
-                name: 'janusz',
-                password: samplepassword
-            });
-
-            let deletedUser = new User({
-                name: 'mateusz',
-                password: samplepassword,
-                deleted: true
-            });
-
-            user.save((err)=> {
-                deletedUser.save((err)=> {
-                    done();
-                })
-            })
-        });
 
         it('should respond with http 401 if user not exists', (done)=> {
             chai.request(server)

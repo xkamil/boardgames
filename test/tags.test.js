@@ -1,9 +1,6 @@
 process.env.NODE_ENV = 'test';
 
-let bcrypt = require('bcryptjs');
 let mongoose = require('mongoose');
-let User = require('./../controllers/models/user');
-let Tag = require('./../controllers/models/tag');
 let SpecHelper = require("./spec_helper");
 
 let chai = require('chai');

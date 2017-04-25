@@ -4,7 +4,6 @@ let SpecHelper = require("./spec_helper");
 let bcrypt = require('bcryptjs');
 let mongoose = require('mongoose');
 let User = require('./../controllers/models/user');
-let Place = require('./../controllers/models/place');
 let Status = require('./../controllers/models/status');
 
 let chai = require('chai');
