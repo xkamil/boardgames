@@ -87,21 +87,30 @@ let addTestPlaces = (testData, callback) => {
 
     let place3 = new Place({
         user_id: testData.users.user3._id,
-        description: 'user2 place1'
+        description: 'user2 place1',
+        status: Status.active
+    });
+
+    let place4 = new Place({
+        user_id: testData.users.user2._id,
+        description: 'user2 place1',
+        status: Status.deleted
     });
 
     place1.save((err, place1)=> {
         place2.save((err, place2)=> {
             place3.save((err, place3)=> {
+                place4.save((err, place4)=> {
+                    testData.places = {
+                        place1: place1,
+                        place2: place2,
+                        place3: place3,
+                        place4: place4
 
-                testData.places = {
-                    place1: place1,
-                    place2: place2,
-                    place3: place3
+                    };
 
-                };
-
-                callback(testData);
+                    callback(testData);
+                });
             })
         })
     });

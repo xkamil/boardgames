@@ -17,7 +17,7 @@ router.get('/', (req, res, next)=> {
     if (user && user.admin) {
         let qStatus = req.query.status;
         if (qStatus) {
-            query = {status: qStatus};
+            query = {status: qStatus.toUpperCase()};
         } else {
             query = {}
         }

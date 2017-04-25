@@ -6,8 +6,8 @@ let commentSchema = new Schema(
     {
         created: {type: Date, default: Date.now},
         updated: {type: Date, default: Date.now},
-        user_id: ObjectId,
-        place_Id: ObjectId,
+        user_id: Schema.Types.ObjectId,
+        place_Id: Schema.Types.ObjectId,
         comment: String,
         status: {type: String, default: Status.active}
     },

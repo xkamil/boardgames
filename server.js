@@ -39,6 +39,10 @@ app.use('/users', usersRouter);
 let tagsRouter = require('./controllers/routes/tags');
 app.use('/tags', tagsRouter);
 
+// # Places
+let placesRouter = require('./controllers/routes/places');
+app.use('/places', placesRouter);
+
 // # Error handler
 let errorHandlerRouter = require('./controllers/middleware/error_handler');
 app.use(errorHandlerRouter);
