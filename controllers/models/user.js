@@ -3,10 +3,12 @@ let Schema = mongoose.Schema;
 
 let userSchema = new Schema(
     {
-        name: String,
+        email: String,
         password: String,
         admin: {type: Boolean, default: false},
-        deleted: {type: Boolean, default: false}
+        deleted: {type: Boolean, default: false},
+        created: {type: Date, default: Date.now},
+        updated: {type: Date, default: Date.now},
     },
     {
         versionKey: false

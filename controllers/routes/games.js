@@ -1,6 +1,6 @@
 let express = require('express');
 let router = express.Router();
-let E = require('../../exceptions/exceptions');
+let E = require('../../exceptions');
 
 let Game = require('../models/game');
 

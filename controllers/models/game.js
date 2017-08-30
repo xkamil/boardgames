@@ -8,8 +8,7 @@ let gameSchema = new Schema(
         players_min: Number,
         players_max: Number,
         complexity: Number,
-        playing_time: Number,
-        home_reservation: Boolean
+        playing_time: Number
     },
     {
         versionKey: false

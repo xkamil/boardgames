@@ -1,15 +1,13 @@
-process.env.NODE_ENV = 'test';
-
 let SpecHelper = require("./spec_helper");
 let bcrypt = require('bcryptjs');
 let mongoose = require('mongoose');
 let User = require('./../controllers/models/user');
-let Status = require('./../controllers/models/status');
 
 let chai = require('chai');
 let chaiHttp = require('chai-http');
 let server = require('../server');
 let should = chai.should();
+let fail = chai.fail;
 
 chai.use(chaiHttp);
 
@@ -58,7 +56,7 @@ describe('USERS', () => {
         });
 
         it('should respond with http 200 and user data', (done)=> {
-            User.findOne({name: 'janusz'}, (err, user) => {
+            User.findOne({email: 'janusz@pega.com'}, (err, user) => {
                 if (err || !user) fail();
 
                 chai.request(server)
@@ -66,7 +64,7 @@ describe('USERS', () => {
                     .set('x-access-token', testData.users.token1)
                     .end((err, res) => {
                         res.should.have.status(200);
-                        res.body.should.have.property('name');
+                        res.body.should.have.property('email');
                         res.body.should.have.property('admin');
                         res.body.should.have.property('deleted');
                         res.body.should.have.property('_id');
@@ -85,7 +83,7 @@ describe('USERS', () => {
                 .set('x-access-token', testData.users.token1)
                 .end((err, res) => {
                     res.should.have.status(200);
-                    chai.expect(res.body.name).to.equal('janusz');
+                    chai.expect(res.body.email).to.equal('janusz@pega.com');
                     chai.expect(res.body.admin).to.equal(true);
                     chai.expect(res.body.deleted).to.equal(false);
                     done();
@@ -120,13 +118,13 @@ describe('USERS', () => {
     describe('DELETE /users/:id', ()=> {
 
         it('should respond with http 200 and updated user data', (done)=> {
-            User.findOne({name: 'janusz'}, (err, user) => {
+            User.findOne({email: 'janusz@pega.com'}, (err, user) => {
                 chai.request(server)
                     .delete('/users/' + user._id)
                     .set('x-access-token', testData.users.token1)
                     .end((err, res) => {
                         res.should.have.status(200);
-                        res.body.should.have.property('name');
+                        res.body.should.have.property('email');
                         res.body.should.have.property('admin');
                         res.body.should.have.property('deleted');
                         res.body.should.have.property('_id');
@@ -152,39 +150,4 @@ describe('USERS', () => {
 
     });
 
-    describe('GET /users/me/places', ()=> {
-
-        it('should respond with http 200 and list with 2 places', (done)=> {
-
-            chai.request(server)
-                .get('/users/me/places')
-                .set('x-access-token', testData.users.token1)
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    chai.expect(res.body.length).to.equal(2);
-                    done();
-                })
-        });
-
-        it('should filter places by status in query string', (done)=> {
-
-            chai.request(server)
-                .get('/users/me/places?status=' + Status.draft)
-                .set('x-access-token', testData.users.token1)
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    chai.expect(res.body.length).to.equal(1);
-
-                    chai.request(server)
-                        .get('/users/me/places?status=' + Status.deleted)
-                        .set('x-access-token', testData.users.token1)
-                        .end((err, res) => {
-                            res.should.have.status(200);
-                            chai.expect(res.body.length).to.equal(0);
-                            done();
-                        })
-
-                })
-        });
-    });
 });

@@ -44,7 +44,7 @@ describe('AUTHORIZATION', () => {
         it('should respond with http 200 if accessing protected route with token in query string', (done)=> {
             chai.request(server)
                 .post('/authenticate')
-                .send({username: 'janusz', password: 'testpass'})
+                .send({email: 'janusz@pega.com', password: 'testpass'})
                 .end((err, res) => {
                     let token = res.body.token;
 
@@ -60,7 +60,7 @@ describe('AUTHORIZATION', () => {
         it('should respond with http 200 if accessing protected route with token in header', (done)=> {
             chai.request(server)
                 .post('/authenticate')
-                .send({username: 'janusz', password: 'testpass'})
+                .send({email: 'janusz@pega.com', password: 'testpass'})
                 .end((err, res) => {
                     let token = res.body.token;
 
@@ -77,11 +77,11 @@ describe('AUTHORIZATION', () => {
         it('should respond with http 401 if accessing protected route as deleted user', (done)=> {
             chai.request(server)
                 .post('/authenticate')
-                .send({username: 'janusz', password: 'testpass'})
+                .send({email: 'janusz@pega.com', password: 'testpass'})
                 .end((err, res) => {
                     let token = res.body.token;
 
-                    User.findOneAndUpdate({name: 'janusz'}, {deleted: true}, (err) => {
+                    User.findOneAndUpdate({email: 'janusz@pega.com'}, {deleted: true}, (err) => {
                         chai.request(server)
                             .get('/users?token=' + token)
                             .end((err, res) => {

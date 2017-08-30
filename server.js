@@ -34,13 +34,9 @@ app.use(authorizationRouter);
 let usersRouter = require('./controllers/routes/users');
 app.use('/users', usersRouter);
 
-// # Tags
+// # Games
 let tagsRouter = require('./controllers/routes/games');
-app.use('/tags', tagsRouter);
-
-// # Places
-let placesRouter = require('./controllers/routes/places');
-app.use('/places', placesRouter);
+app.use('/games', tagsRouter);
 
 // # Error handler
 let errorHandlerRouter = require('./controllers/middleware/error_handler');

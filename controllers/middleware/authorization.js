@@ -1,4 +1,4 @@
-let exceptions = require('../../exceptions/exceptions');
+let exceptions = require('../../exceptions');
 let config = require('../../config/config');
 let jwt = require('jsonwebtoken');
 let User = require('../models/user');
@@ -16,7 +16,7 @@ module.exports = (req, res, next)=> {
         User.findById(decodedUser._id, (err, user) => {
             if(err) return next(err);
             if(!user) return next(new exceptions.AuthenticationFailed('User not found.'));
-            if(user.deleted) return next(new exceptions.AuthenticationFailed('User is not active.'));
+            if(user.deleted) return next(new exceptions.AuthenticationFailed('User is deleted.'));
 
             req.user = decodedUser;
             next();

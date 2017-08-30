@@ -34,7 +34,7 @@ describe('AUTHENTICATION', () => {
         it('should respond with http 201', (done) => {
             chai.request(server)
                 .post('/register')
-                .send({username: 'matedusz', password: 'testpass'})
+                .send({email: 'matedusz@pega.com', password: 'testpass'})
                 .end((err, res) => {
                     res.should.have.status(201);
                     res.body.should.have.property('_id');
@@ -45,7 +45,7 @@ describe('AUTHENTICATION', () => {
         it('should respond with http 409 if username already taken', (done) => {
             chai.request(server)
                 .post('/register')
-                .send({username: 'roman', password: 'testpass'})
+                .send({email: 'roman@pega.com', password: 'testpass'})
                 .end((err, res) => {
                     res.should.have.status(409);
                     done();
@@ -56,7 +56,7 @@ describe('AUTHENTICATION', () => {
 
             chai.request(server)
                 .post('/register')
-                .send({username: 'mate', password: 'testpass'})
+                .send({email: 'mate', password: 'testpass'})
                 .end((err, res) => {
                     res.should.have.status(400);
                     done();
@@ -67,7 +67,18 @@ describe('AUTHENTICATION', () => {
 
             chai.request(server)
                 .post('/register')
-                .send({username: 'mateusz', password: 'test'})
+                .send({email: 'mateusz@pega.com', password: 'test'})
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    done();
+                })
+        });
+
+        it('should respond with http 400 username is not valid pega mail', (done) => {
+
+            chai.request(server)
+                .post('/register')
+                .send({email: 'mateusz@pega.org', password: 'test'})
                 .end((err, res) => {
                     res.should.have.status(400);
                     done();
@@ -81,7 +92,7 @@ describe('AUTHENTICATION', () => {
         it('should respond with http 401 if user not exists', (done)=> {
             chai.request(server)
                 .post('/authenticate')
-                .send({username: 'matedusz', password: 'testpass'})
+                .send({email: 'matedusz@pega.com', password: 'testpass'})
                 .end((err, res) => {
                     res.should.have.status(401);
                     done();
@@ -91,7 +102,7 @@ describe('AUTHENTICATION', () => {
         it('should respond with http 401 if authenticating as deleted user', (done)=> {
             chai.request(server)
                 .post('/authenticate')
-                .send({username: 'mateusz', password: 'testpass'})
+                .send({email: 'mateusz@pega.com', password: 'testpass'})
                 .end((err, res) => {
                     res.should.have.status(401);
                     done();
@@ -101,7 +112,7 @@ describe('AUTHENTICATION', () => {
         it('should respond with http 401 if password not match', (done)=> {
             chai.request(server)
                 .post('/authenticate')
-                .send({username: 'janusz', password: 'testpass2'})
+                .send({email: 'janusz@pega.com', password: 'testpass2'})
                 .end((err, res) => {
                     res.should.have.status(401);
                     done();
@@ -111,7 +122,7 @@ describe('AUTHENTICATION', () => {
         it('should respond with http 200 and token if valid credentials sent', (done)=> {
             chai.request(server)
                 .post('/authenticate')
-                .send({username: 'janusz', password: 'testpass'})
+                .send({email: 'janusz@pega.com', password: 'testpass'})
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.have.property('token');
