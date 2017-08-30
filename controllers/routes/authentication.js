@@ -12,6 +12,7 @@ router.post('/register', (req, res, next)=> {
     let password = req.body.password;
 
     if (!username || username.length < 5) return next(new exceptions.BadRequest('Username required. Min 5 characters.', null, 4001));
+    if (!/.*@pega.com$/.test(username)) return next(new exceptions.BadRequest('Username invalid. Regex Pattern: .*@pega.com', null, 4003));
     if (!password || password.length < 5) return next(new exceptions.BadRequest('Password required. Min 5 characters.', null, 4002));
 
     User.findOne({name: username}, (err, user)=> {

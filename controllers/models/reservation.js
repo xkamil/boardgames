@@ -2,14 +2,13 @@ let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 let Status = require('./status');
 
-let commentSchema = new Schema(
+let reservationSchema = new Schema(
     {
         created: {type: Date, default: Date.now},
         updated: {type: Date, default: Date.now},
         user_id: Schema.Types.ObjectId,
-        place_Id: Schema.Types.ObjectId,
-        comment: String,
-        status: {type: String, default: Status.active}
+        reservation_date: Date,
+        optional: Boolean
     },
     {
         versionKey: false
@@ -17,4 +16,4 @@ let commentSchema = new Schema(
 );
 
 
-module.exports = mongoose.model('Comment', commentSchema);
+module.exports = mongoose.model('Reservation', reservationSchema);

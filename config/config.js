@@ -1,5 +1,12 @@
-let ENV = process.env.NODE_ENV;
-let env = ENV || 'prod';
+let enviroments = ['prod','test','dev'];
+let env = process.argv[2];
+let currentEnv;
 
-module.exports = require('./' + env + '.json');
+if(enviroments.indexOf(env) == -1){
+    currentEnv = 'test';
+}else{
+    currentEnv = env;
+}
+
+module.exports = require('./' + currentEnv + '.json');
 

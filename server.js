@@ -25,7 +25,6 @@ config.env == 'test' || app.use(morgan('dev'));
 // # Authentication
 let authRouter = require('./controllers/routes/authentication');
 app.use(authRouter);
-console.log();
 
 // # Authorization middleware
 let authorizationRouter = require('./controllers/middleware/authorization');
@@ -36,7 +35,7 @@ let usersRouter = require('./controllers/routes/users');
 app.use('/users', usersRouter);
 
 // # Tags
-let tagsRouter = require('./controllers/routes/tags');
+let tagsRouter = require('./controllers/routes/games');
 app.use('/tags', tagsRouter);
 
 // # Places

@@ -30,7 +30,7 @@ router.get('/me', (req, res, next)=> {
 });
 
 // Get places added by user. Filtered by place status
-router.get('/me/places', (req, res, next)=> {
+router.get('/me/reservations', (req, res, next)=> {
     let status = req.query.status;
     let query = {user_id: req.user._id};
 

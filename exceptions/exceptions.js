@@ -1,59 +1,44 @@
-module.exports.AuthenticationFailed = function (message, status, statusCode) {
-    let error = {};
+module.exports = {
 
-    error.message = message || 'Authentication failed.';
-    error.status = status || 401;
-    if (statusCode) error.statusCode = statusCode;
+    AuthenticationFailed: function (message, status) {
+        return {
+            message: message || 'Authentication failed.',
+            status: status || 401
+        };
+    },
 
-    return error;
-};
+    AuthorizationException: function (message, status) {
+        return {
+            message: message || 'Authorization failed.',
+            status: status || 403
+        }
+    },
 
-module.exports.AuthorizationException = function (message, status, statusCode) {
-    let error = {};
+    BadRequest: function (message, status) {
+        return {
+            message: message || 'Bad request.',
+            status: status || 400
+        }
+    },
 
-    error.message = message || 'Authorization failed.';
-    error.status = status || 403;
-    if (statusCode) error.statusCode = statusCode;
+    ResourceConflict: function (message, status) {
+        return {
+            message: message || 'Resource already exists.',
+            status: status || 409
+        }
+    },
 
-    return error;
-};
+    ResourceNotFound: function (message, status) {
+        return {
+            message: message || 'Resource not found.',
+            status: status || 404
+        }
+    },
 
-module.exports.BadRequest = function (message, status, statusCode) {
-    let error = {};
-
-    error.message = message || 'Bad request.';
-    error.status = status || 400;
-    if (statusCode) error.statusCode = statusCode;
-
-    return error;
-};
-
-module.exports.ResourceConflict = function (message, status, statusCode) {
-    let error = {};
-
-    error.message = message || 'Resource already exists.';
-    error.status = status || 409;
-    if (statusCode) error.statusCode = statusCode;
-
-    return error;
-};
-
-module.exports.ResourceNotFound = function (message, status, statusCode) {
-    let error = {};
-
-    error.message = message || 'Resource not found.';
-    error.status = status || 404;
-    if (statusCode) error.statusCode = statusCode;
-
-    return error;
-};
-
-module.exports.InternalServerException = function (message, status, statusCode) {
-    let error = {};
-
-    error.message = message || 'Internal server exception.';
-    error.status = status || 500;
-    if (statusCode) error.statusCode = statusCode;
-
-    return error;
+    InternalServerException: function (message, status) {
+        return {
+            message: message || 'Internal server exception.',
+            status: status || 500
+        }
+    }
 };
