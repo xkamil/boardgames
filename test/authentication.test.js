@@ -1,32 +1,34 @@
 process.env.NODE_ENV = 'test';
 
 let mongoose = require('mongoose');
-let SpecHelper = require("./spec_helper");
 let chai = require('chai');
 let chaiHttp = require('chai-http');
 let server = require('../server');
 let should = chai.should();
+let User = require('./../controllers/models/user');
+let testData = require('./spec_helper').testData;
+let ObjectId = mongoose.Types.ObjectId;
 
 
 chai.use(chaiHttp);
 
 describe('AUTHENTICATION', () => {
 
-    let testData;
-
     beforeEach((done)=> {
+        let promises = [];
 
-        SpecHelper.beforeEach((data) => {
-            testData = data;
-            done();
-        });
+        // Add users to database
+        for (let i = 0; i < testData.users.length; i++) {
+            promises.push(new Promise((resolve) => {
+                new User(testData.users[i]).save((err, usr) => {resolve()})
+            }));
+        }
 
+        Promise.all(promises).then(()=> {done();});
     });
 
     afterEach((done)=> {
-
-        SpecHelper.afterEach(done);
-
+        User.remove({}, (err)=> { done() });
     });
 
     describe('POST /register', ()=> {
@@ -131,4 +133,4 @@ describe('AUTHENTICATION', () => {
         });
 
     });
-});
+})

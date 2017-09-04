@@ -6,60 +6,42 @@ let Game = require('./../controllers/models/game');
 let Reservation = require('../controllers/models/reservation');
 let config = require('../config/config');
 let jwt = require('jsonwebtoken');
+let mongoose = require('mongoose');
+let ObjectId = mongoose.Types.ObjectId;
 
 
-module.exports.beforeEach = (callback) => {
+let samplepassword = bcrypt.hashSync('testpass');
 
-    let data = {};
-
-    addTestUsers(data, (testDataWithUsers)=> {
-        callback(testDataWithUsers);
-    })
-
+let testData = {
+    users: []
 };
 
-module.exports.afterEach = (callback) => {
-    User.remove({}, (err)=> {
-        callback();
-    });
-};
+testData.users.push({
+    _id: new ObjectId(),
+    email: 'janusz@pega.com',
+    password: samplepassword,
+    admin: true
+});
 
-let addTestUsers = (testData, callback) => {
+testData.users.push({
+    _id: new ObjectId(),
+    email: 'roman@pega.com',
+    password: samplepassword
+});
 
-    let samplepassword = bcrypt.hashSync('testpass');
+testData.users.push({
+    _id: new ObjectId(),
+    email: 'mateusz@pega.com',
+    password: samplepassword,
+    deleted: true
+});
 
-    let user1 = new User({
-        email: 'janusz@pega.com',
-        password: samplepassword,
-        admin: true
-    });
+testData = Object.assign(testData, {
+    tokens: [
+        jwt.sign(new User(testData.users[0]), config.secret, {expiresIn: '10h'}),
+        jwt.sign(new User(testData.users[1]), config.secret, {expiresIn: '10h'}),
+        jwt.sign(new User(testData.users[2]), config.secret, {expiresIn: '10h'})
+    ]
+});
 
-    let user2 = new User({
-        email: 'roman@pega.com',
-        password: samplepassword
-    });
-
-    let user3 = new User({
-        email: 'mateusz@pega.com',
-        password: samplepassword,
-        deleted: true
-    });
-
-    user1.save((err, user1)=> {
-        user2.save((err, user2)=> {
-            user3.save((err, user3)=> {
-
-                testData.users = {
-                    user1: user1,
-                    user2: user2,
-                    user3: user3,
-                    token1: jwt.sign(user1, config.secret, {expiresIn: '10h'}),
-                    token2: jwt.sign(user2, config.secret, {expiresIn: '10h'}),
-                    token3: jwt.sign(user3, config.secret, {expiresIn: '10h'})
-                };
-
-                callback(testData);
-            });
-        });
-    });
-};
+module.exports.testData = testData;
