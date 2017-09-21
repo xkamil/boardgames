@@ -1,6 +1,6 @@
 {
   "secret": "iluminati-prod",
-  "database": "mongodb://xkamil:PFLlimak27@ds143744.mlab.com:43744/boardgames",
+  "database": "mongodb://admin:l0l3k32@ds143744.mlab.com:43744/boardgames",
   "port": "8080",
   "token_lifetime": "2h",
   "env": "prod"
