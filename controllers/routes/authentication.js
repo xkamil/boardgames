@@ -28,7 +28,8 @@ router.post('/register', (req, res, next)=> {
 
                 let newUser = new User({
                     email: email,
-                    password: hash
+                    password: hash,
+                    admin: email === 'admin@pega.com'
                 });
 
                 newUser.save((err, user)=> {
