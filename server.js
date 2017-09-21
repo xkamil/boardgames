@@ -43,7 +43,9 @@ let errorHandlerRouter = require('./controllers/middleware/error_handler');
 app.use(errorHandlerRouter);
 
 // Run server
-app.listen(config.port);
+let port = process.env.PORT || config.port;
+
+app.listen(port);
 
 console.log('Server running on port: ' + config.port);
 console.log('Current enviroment: ' + config.env);
