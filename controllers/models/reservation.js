@@ -16,5 +16,4 @@ let reservationSchema = new Schema(
     }
 );
 
-
 module.exports = mongoose.model('Reservation', reservationSchema);

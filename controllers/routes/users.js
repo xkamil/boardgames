@@ -1,6 +1,6 @@
 let express = require('express');
 let router = express.Router();
-let exceptions = require('../../exceptions');
+let E = require('../../exceptions');
 let bcrypt = require('bcryptjs');
 
 let User = require('../models/user');
@@ -10,7 +10,7 @@ router.put('/me/password', (req, res, next) => {
     let user = req.user;
     let newPassword = req.body.password;
 
-    if (!newPassword || newPassword.length < 5) return next(new exceptions.BadRequest('Password required. Min 5 characters.', null, 4002));
+    if (!newPassword || newPassword.length < 5) return next(new E.BadRequest('Password required. Min 5 characters.'));
 
         bcrypt.genSalt(10, (err, salt) => {
             bcrypt.hash(newPassword, salt, (err, hash) => {
@@ -24,18 +24,17 @@ router.put('/me/password', (req, res, next) => {
         });
 });
 
-router.get('/me', (req, res, next)=> {
+// Get logged in user
+router.get('/me', (req, res)=> {
     res.json(req.user);
 });
 
 
 // Get user by id
 router.get('/:id', (req, res, next)=> {
-    let userId = req.params.id;
-
-    User.findOne({_id: userId}, (err, user)=> {
+    User.findOne({_id: req.params.id}, (err, user)=> {
         if (err) return next(err);
-        if (!user) return next(new exceptions.ResourceNotFound('User not found.'));
+        if (!user) return next(new E.ResourceNotFound());
         res.json(user);
     })
 });
@@ -44,14 +43,13 @@ router.get('/:id', (req, res, next)=> {
 router.delete('/:id', (req, res, next) => {
     let loggedUser = req.user;
     let userId = req.params.id;
-    let query = {_id: userId};
 
     User.findById(userId, (err, user) => {
         if (err) return next(err);
-        if (!user) return next(new exceptions.ResourceNotFound());
+        if (!user) return next(new E.ResourceNotFound());
 
         if (!loggedUser.admin || loggedUser._id != userId) {
-            return next(new exceptions.AuthorizationException('You cant delete other users.'));
+            return next(new E.AuthorizationException('You cant delete other users.'));
         }
 
         user.deleted = true;

@@ -32,9 +32,9 @@ router.post('/', (req, res, next) => {
     });
 });
 
-router.delete('/:game', (req, res, next)=> {
+router.delete('/:gameId', (req, res, next)=> {
     let user = req.user;
-    let gameId = req.params.game;
+    let gameId = req.params.gameId;
 
     if (!user || !user.admin)return next(new E.AuthorizationException('Not authorized to remove games.'));
 

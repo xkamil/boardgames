@@ -5,6 +5,7 @@ let gameSchema = new Schema(
     {
         name: String,
         link: String,
+        image_link: String,
         players_min: Number,
         players_max: Number,
         complexity: Number,

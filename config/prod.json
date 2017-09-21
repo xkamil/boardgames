@@ -1,7 +1,7 @@
 {
   "secret": "iluminati-prod",
-  "database": "mongodb://127.0.0.1:27017/fishemall",
+  "database": "mongodb://xkamil:PFLlimak27@ds143744.mlab.com:43744/boardgames",
   "port": "8080",
-  "token_lifetime": "10h",
+  "token_lifetime": "2h",
   "env": "prod"
 }
