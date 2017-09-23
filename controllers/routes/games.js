@@ -1,8 +1,11 @@
 let express = require('express');
 let router = express.Router();
 let E = require('../../exceptions');
-
 let Game = require('../models/game');
+
+let admin_access = require('../middleware/admin_middleware');
+
+// Public api ==============================
 
 router.get('/', (req, res, next)=> {
     Game.find({}, (err, games)=> {
@@ -12,27 +15,35 @@ router.get('/', (req, res, next)=> {
     });
 });
 
-router.post('/', (req, res, next) => {
+// Admin access only api ====================
+
+router.post('/', admin_access, (req, res, next) => {
     let user = req.user;
-    let game = req.body.game;
+    let newGame = req.body;
 
-    if (!user || !user.admin) return next(new E.AuthorizationException('Not authorized to add new games.'));
-    if (!game || game.name.length == 0) return next(new E.BadRequest('Name is required'));
+    console.log('Adding new game:', newGame);
 
-    Game.findOne({name: game.name}, (err, game) => {
-        if (err) return next(err);
-        if (game) return res.next(new E.ResourceConflict('Game ' + game.name + ' already exists'));
+    
+    Game.findOne({name: newGame.name}, (err, game) => {
+        if (err) {
+            console.log('Error when reading from db');
+            return next(err);
+        }
+        if (game) {
+            console.log('Game with that name already exists');
+            return next(new E.ResourceConflict('Game ' + game.name + ' already exists'));
+        }
 
-        let newGame = new Game(game);
+        let gameObj = new Game(newGame);
 
-        newGame.save((err)=> {
+        gameObj.save((err, game)=> {
             if (err) return next(err);
             res.status(201).json(game)
         });
     });
 });
 
-router.delete('/:gameId', (req, res, next)=> {
+router.delete('/:gameId', admin_access, (req, res, next)=> {
     let user = req.user;
     let gameId = req.params.gameId;
 

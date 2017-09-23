@@ -8,9 +8,6 @@ let User = require('../models/user');
 let bcrypt = require('bcryptjs');
 
 router.post('/register', (req, res, next)=> {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
     let email = req.body.email;
     let password = req.body.password;
 
@@ -42,9 +39,6 @@ router.post('/register', (req, res, next)=> {
 });
 
 router.post('/login', (req, res, next)=> {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
     let email = req.body.email || '';
     let password = req.body.password || '';
 

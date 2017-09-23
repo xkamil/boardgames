@@ -20,15 +20,15 @@ app.use(bodyParser.json());
 // Setup logging
 config.env == 'test' || app.use(morgan('dev'));
 
-// Routes
+// Routes =========================================
 
 // # Authentication
 let authRouter = require('./controllers/routes/authentication');
 app.use(authRouter);
 
 // # Authorization middleware
-let authorizationRouter = require('./controllers/middleware/authorization');
-app.use(authorizationRouter);
+let baseMiddleware = require('./controllers/middleware/base_middleware');
+app.use(baseMiddleware);
 
 // # Users
 let usersRouter = require('./controllers/routes/users');
@@ -42,7 +42,7 @@ app.use('/games', tagsRouter);
 let errorHandlerRouter = require('./controllers/middleware/error_handler');
 app.use(errorHandlerRouter);
 
-// Run server
+// Run server ==================================
 let port = process.env.PORT || config.port;
 
 app.listen(port);
